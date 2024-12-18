@@ -49,7 +49,7 @@ Les données utilisées dans ce projet proviennent de la compétition Kaggle **[
 ## Instructions
 
 1. **Préparation et Entraînement du Modèle** :  
-   - Préparez les données avec les scripts disponibles dans `src/data_preprocessing`.  
+   - Préparez les données avec les scripts disponibles dans `src/data_preprocessing`, la préparation des données et le feature engineering est issus du [kernels Kaggle](https://www.kaggle.com/c/home-credit-default-risk/data)
    - Entraînez et évaluez le modèle avec les notebooks dans `notebooks/`.
 
 2. **Analyse des Features** :  
