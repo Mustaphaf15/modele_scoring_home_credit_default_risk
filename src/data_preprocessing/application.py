@@ -4,6 +4,7 @@ import numpy as np
 import gc
 from .utils import one_hot_encoder
 
+
 def preprocess_application(num_rows=None, nan_as_category=False):
     """Prétraitement des fichiers application_train.csv et application_test.csv."""
     df = pd.read_csv('./data/application_train.csv', nrows=num_rows)

@@ -3,6 +3,7 @@ import pandas as pd
 import gc
 from .utils import one_hot_encoder
 
+
 def preprocess_bureau(num_rows=None, nan_as_category=True):
     bureau = pd.read_csv('./data/bureau.csv', nrows=num_rows)
     bb = pd.read_csv('./data/bureau_balance.csv', nrows=num_rows)

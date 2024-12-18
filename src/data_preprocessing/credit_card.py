@@ -3,6 +3,7 @@ import gc
 import pandas as pd
 from .utils import one_hot_encoder
 
+
 def credit_card(num_rows=None, nan_as_category=False):
     # Charger les données du fichier credit_card_balance
     credit_card = pd.read_csv('./data/credit_card_balance.csv', nrows=num_rows)

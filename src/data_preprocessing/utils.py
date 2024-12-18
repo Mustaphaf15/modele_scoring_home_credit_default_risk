@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
-import numpy as np
 import time
 from contextlib import contextmanager
+
 
 @contextmanager
 def timer(title):
     t0 = time.time()
     yield
     print(f"{title} - done in {time.time() - t0:.0f}s")
+
 
 def one_hot_encoder(df, nan_as_category=True):
     """Applique le one-hot encoding sur les colonnes catégoriques."""

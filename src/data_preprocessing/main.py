@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import pandas as pd
 import gc
 from application import application
 from bureau import bureau
@@ -7,6 +6,7 @@ from previous_applications import previous_applications
 from pos_cash import pos_cash
 from installments import installments
 from credit_card import credit_card
+
 
 def main():
     # Définir le nombre de lignes à lire (None pour tout lire)

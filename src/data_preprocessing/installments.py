@@ -3,6 +3,7 @@ import gc
 import pandas as pd
 from .utils import one_hot_encoder
 
+
 def installments(num_rows=None, nan_as_category=False):
     # Charger les données du fichier installments_payments
     installments = pd.read_csv('./data/installments_payments.csv', nrows=num_rows)

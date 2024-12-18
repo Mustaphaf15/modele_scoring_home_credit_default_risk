@@ -3,6 +3,7 @@ import gc
 import pandas as pd
 from .utils import one_hot_encoder
 
+
 def pos_cash(num_rows=None, nan_as_category=False):
     # Charger les données du fichier POS_CASH_balance
     pos_cash = pd.read_csv('./data/POS_CASH_balance.csv', nrows=num_rows)

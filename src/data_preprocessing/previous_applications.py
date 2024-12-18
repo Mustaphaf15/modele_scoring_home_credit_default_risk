@@ -3,6 +3,7 @@ import gc
 import pandas as pd
 from .utils import one_hot_encoder
 
+
 def previous_applications(num_rows=None, nan_as_category=False):
     # Charger les données du fichier previous_application
     prev_app = pd.read_csv('./data/previous_application.csv', nrows=num_rows)
