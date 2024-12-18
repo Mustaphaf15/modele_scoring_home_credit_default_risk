@@ -1,52 +1,72 @@
+# __init__.py
+# Ce fichier initialise le module data_preprocessing.
+
+# main.py
 # -*- coding: utf-8 -*-
-import pandas as pd
+"""
+Script principal pour exécuter les modules de prétraitement des données.
+"""
 import gc
-from application import application
-from bureau import bureau
-from previous_applications import previous_applications
-from pos_cash import pos_cash
-from installments import installments
-from credit_card import credit_card
+from src.data_preprocessing.application_train_test import application_train_test
+from src.data_preprocessing.bureau_and_balance import bureau_and_balance
+from src.data_preprocessing.credit_card import credit_card_balance
+from src.data_preprocessing.pos_cash import pos_cash
+from src.data_preprocessing.previous_applications import previous_applications
+from src.data_preprocessing.installments_payments import installments_payments
+from src.data_preprocessing.utils import timer
 
 def main():
-    # Définir le nombre de lignes à lire (None pour tout lire)
-    num_rows = None
-    nan_as_category = False
+    debug = False
+    num_rows = 10000 if debug else None
 
-    # Traiter les différents fichiers
-    print("Traitement du fichier application...")
-    app_data = application(num_rows=num_rows, nan_as_category=nan_as_category)
+    # Charger les données principales
+    df = application_train_test(num_rows)
 
-    print("Traitement du fichier bureau...")
-    bureau_data = bureau(num_rows=num_rows, nan_as_category=nan_as_category)
+    # Traitement des données "bureau" et "bureau_balance"
+    with timer("Process bureau and bureau_balance"):
+        bureau = bureau_and_balance(num_rows)
+        print("Bureau df shape:", bureau.shape)
+        df = df.join(bureau, how='left', on='SK_ID_CURR')
+        del bureau
+        gc.collect()
 
-    print("Traitement du fichier previous_application...")
-    prev_app_data = previous_applications(num_rows=num_rows, nan_as_category=nan_as_category)
+    # Traitement des applications précédentes
+    with timer("Process previous_applications"):
+        prev = previous_applications(num_rows)
+        print("Previous applications df shape:", prev.shape)
+        df = df.join(prev, how='left', on='SK_ID_CURR')
+        del prev
+        gc.collect()
 
-    print("Traitement du fichier POS_CASH_balance...")
-    pos_cash_data = pos_cash(num_rows=num_rows, nan_as_category=nan_as_category)
+    # Traitement des données POS-CASH
+    with timer("Process POS-CASH balance"):
+        pos = pos_cash(num_rows)
+        print("Pos-cash balance df shape:", pos.shape)
+        df = df.join(pos, how='left', on='SK_ID_CURR')
+        del pos
+        gc.collect()
 
-    print("Traitement du fichier installments_payments...")
-    installments_data = installments(num_rows=num_rows, nan_as_category=nan_as_category)
+    # Traitement des paiements échelonnés
+    with timer("Process installments payments"):
+        ins = installments_payments(num_rows)
+        print("Installments payments df shape:", ins.shape)
+        df = df.join(ins, how='left', on='SK_ID_CURR')
+        del ins
+        gc.collect()
 
-    print("Traitement du fichier credit_card_balance...")
-    credit_card_data = credit_card(num_rows=num_rows, nan_as_category=nan_as_category)
+    # Traitement des soldes de carte de crédit
+    with timer("Process credit card balance"):
+        cc = credit_card_balance(num_rows)
+        print("Credit card balance df shape:", cc.shape)
+        df = df.join(cc, how='left', on='SK_ID_CURR')
+        del cc
+        gc.collect()
 
-    # Fusionner toutes les données traitées sur la clé SK_ID_CURR
-    print("Fusion des données traitées...")
-    data = app_data.merge(bureau_data, on='SK_ID_CURR', how='left')
-    data = data.merge(prev_app_data, on='SK_ID_CURR', how='left')
-    data = data.merge(pos_cash_data, on='SK_ID_CURR', how='left')
-    data = data.merge(installments_data, on='SK_ID_CURR', how='left')
-    data = data.merge(credit_card_data, on='SK_ID_CURR', how='left')
-
-    # Sauvegarder le fichier final dans le dossier data
-    data.to_csv('./data/data.csv', index=False)
-    print("Le fichier final a été enregistré sous ./data/data.csv.")
-
-    # Libérer la mémoire
-    del app_data, bureau_data, prev_app_data, pos_cash_data, installments_data, credit_card_data, data
-    gc.collect()
+    # Sauvegarde du fichier final
+    path_output_file = '../../data/preprocessed_data.csv'
+    df.to_csv(path_output_file, index=False)
+    print(f'Le fichier {path_output_file} est sauvegardé')
+    print('Fin du traitement')
 
 if __name__ == "__main__":
     main()

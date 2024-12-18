@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
-import gc
 import pandas as pd
-from .utils import one_hot_encoder
+import gc
+from src.data_preprocessing.utils import one_hot_encoder
 
-def credit_card(num_rows=None, nan_as_category=False):
-    # Charger les données du fichier credit_card_balance
-    credit_card = pd.read_csv('./data/credit_card_balance.csv', nrows=num_rows)
-    print(f"Nombre d'échantillons dans credit_card_balance : {len(credit_card)}")
-
-    # Encodage des variables binaires
-    for bin_feature in ['SK_ID_CURR', 'SK_ID_PREV']:
-        credit_card[bin_feature], uniques = pd.factorize(credit_card[bin_feature])
-
-    # Appliquer l'encodage One-Hot
-    credit_card, cat_cols = one_hot_encoder(credit_card, nan_as_category)
-
-    del credit_card
+def credit_card_balance(num_rows = None, nan_as_category = True):
+    cc = pd.read_csv('../../data/credit_card_balance.csv', nrows = num_rows)
+    cc, cat_cols = one_hot_encoder(cc, nan_as_category= True)
+    # General aggregations
+    cc.drop(['SK_ID_PREV'], axis= 1, inplace = True)
+    cc_agg = cc.groupby('SK_ID_CURR').agg(['min', 'max', 'mean', 'sum', 'var'])
+    cc_agg.columns = pd.Index(['CC_' + e[0] + "_" + e[1].upper() for e in cc_agg.columns.tolist()])
+    # Count credit card lines
+    cc_agg['CC_COUNT'] = cc.groupby('SK_ID_CURR').size()
+    del cc
     gc.collect()
-    return credit_card
+    return cc_agg
