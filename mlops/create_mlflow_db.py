@@ -14,5 +14,3 @@ if not os.path.exists(data_dir):
 # Définir la base de données SQLAlchemy
 DATABASE_URL = f"sqlite:///{db_path}"
 engine = create_engine(DATABASE_URL, echo=True)
-
-# il faudra lancer la commande pour lancer le serveur mlflow  mlflow ui --backend-store-uri sqlite:///data/mlflow.db --default-artifact-root ./artifacts --host localhost
