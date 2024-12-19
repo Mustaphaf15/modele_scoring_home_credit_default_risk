@@ -59,6 +59,9 @@ def train_random_forest(df, num_folds, use_smote=False):
         mlflow.log_artifact(train_path)
         mlflow.log_artifact(test_path)
 
+        del test_df
+        gc.collect()
+
         # Définir le modèle et les hyperparamètres pour RandomizedSearchCV
         base_model = RandomForestClassifier(
             random_state=1001,
@@ -114,6 +117,8 @@ def train_random_forest(df, num_folds, use_smote=False):
             oof_preds[valid_idx] = best_model.predict_proba(valid_x)[:, 1]
 
             print(f"Fold {fold + 1} completed.")
+            del train_x, train_y, valid_x, valid_y
+            gc.collect()
 
         # Évaluer les performances globales
         full_auc = roc_auc_score(train_df['TARGET'], oof_preds)

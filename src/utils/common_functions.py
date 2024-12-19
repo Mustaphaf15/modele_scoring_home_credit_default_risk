@@ -16,6 +16,13 @@ def normalize_column_names(df):
     df[column_bool] = df[column_bool].apply(
         lambda col: col.map({True: 1, False: 0}) if col.isin([True, False]).any() else col)
     df = df.replace([np.inf, -np.inf], np.nan)
+
+    # Sélectionner les colonnes de type float64
+    # numpy._core._exceptions._ArrayMemoryError: Unable to allocate 1.96 GiB for an array with shape (339321, 774) and data type float64
+    float_cols = df.select_dtypes(include=['float64']).columns
+
+    # Convertir ces colonnes en float32
+    df[float_cols] = df[float_cols].astype(np.float32)
     return df
 
 def business_cost(y_true, y_proba, threshold=0.5):

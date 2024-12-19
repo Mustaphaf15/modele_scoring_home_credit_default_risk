@@ -61,8 +61,7 @@ Les données utilisées dans ce projet proviennent de la compétition Kaggle **[
    - Testez l’API avec l’interface utilisateur incluse ou via des outils comme **Postman**.
 
 4. **Approche MLOps** :  
-   - Configurez MLFlow pour suivre les expérimentations et versionner les modèles.  
-   - Surveillez les performances en production, notamment le **data drift**, avec les outils disponibles dans `mlops/`.
+   - Configurez MLFlow pour suivre les expérimentations et versionner les modèles.
 
 ## Formation OpenClassrooms
 
