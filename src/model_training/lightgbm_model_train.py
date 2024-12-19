@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import gc
 import os
-from datetime import datetime
 import time
-import re
-import pandas as pd
-import numpy as np
+from datetime import datetime
+
+import matplotlib.pyplot as plt
 import mlflow
 import mlflow.lightgbm
-import seaborn as sns
-import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from lightgbm import LGBMClassifier, early_stopping, log_evaluation
-from sklearn.metrics import roc_auc_score, confusion_matrix, classification_report, roc_curve
+from sklearn.metrics import roc_auc_score, roc_curve
 from sklearn.model_selection import KFold, StratifiedKFold
 
 from src.utils.common_functions import normalize_column_names, business_cost
