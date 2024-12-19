@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import gc
+import os
 from datetime import datetime
 import time
 import re
@@ -48,11 +49,17 @@ def kfold_lightgbm(df, num_folds, stratified=False):
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     with mlflow.start_run(run_name=f'LightGBM_{current_time}'):
+        # Créer le répertoire pour les artefacts
+        metrics_dir = "artifacts/metrics"
+        os.makedirs(metrics_dir, exist_ok=True)
+
         # Enregistrer les datasets comme artefacts
-        train_df.to_csv("../../train_data.csv", index=False)
-        test_df.to_csv("../../test_data.csv", index=False)
-        mlflow.log_artifact("../../train_data.csv")
-        mlflow.log_artifact("../../test_data.csv")
+        train_path = os.path.join(metrics_dir, "train_data.csv")
+        test_path = os.path.join(metrics_dir, "test_data.csv")
+        train_df.to_csv(train_path, index=False)
+        test_df.to_csv(test_path, index=False)
+        mlflow.log_artifact(train_path)
+        mlflow.log_artifact(test_path)
 
         for n_fold, (train_idx, valid_idx) in enumerate(folds.split(train_df[feats], train_df['TARGET'])):
             train_x, train_y = train_df[feats].iloc[train_idx], train_df['TARGET'].iloc[train_idx]
