@@ -15,6 +15,7 @@ def normalize_column_names(df):
     column_bool = df.select_dtypes(include='object').columns
     df[column_bool] = df[column_bool].apply(
         lambda col: col.map({True: 1, False: 0}) if col.isin([True, False]).any() else col)
+    df = df.replace([np.inf, -np.inf], np.nan)
     return df
 
 def business_cost(y_true, y_proba, threshold=0.5):

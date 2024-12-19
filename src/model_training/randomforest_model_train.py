@@ -5,15 +5,13 @@ from datetime import datetime
 
 import matplotlib.pyplot as plt
 import mlflow
-import mlflow.xgboost
 import numpy as np
 import pandas as pd
 from imblearn.over_sampling import SMOTE
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer  # Importer SimpleImputer pour l'imputation des valeurs manquantes
 from sklearn.metrics import roc_auc_score, roc_curve, make_scorer
 from sklearn.model_selection import KFold, StratifiedKFold, RandomizedSearchCV
-from scipy.stats import uniform
-from xgboost import XGBClassifier
 
 from src.utils.common_functions import normalize_column_names, business_cost
 
@@ -22,9 +20,9 @@ remote_server_ui = "http://localhost:5000/"
 mlflow.set_tracking_uri(remote_server_ui)
 
 # Fonction pour entraîner le modèle
-def train_xgboost(df, num_folds, use_smote=False):
+def train_random_forest(df, num_folds, use_smote=False):
     """
-    Entraîne un modèle XGBoost avec validation k-fold, RandomizedSearchCV, et une option pour gérer le déséquilibre des classes.
+    Entraîne un modèle RandomForestClassifier avec validation k-fold, RandomizedSearchCV, et une option pour gérer le déséquilibre des classes.
 
     :param df: Pandas DataFrame contenant les données.
     :param num_folds: Nombre de folds pour la validation croisée.
@@ -33,7 +31,7 @@ def train_xgboost(df, num_folds, use_smote=False):
     train_df = df[df['TARGET'].notnull()]
     test_df = df[df['TARGET'].isnull()]
 
-    print(f"Starting XGBoost. Train shape: {train_df.shape}, test shape: {test_df.shape}")
+    print(f"Starting Random Forest. Train shape: {train_df.shape}, test shape: {test_df.shape}")
 
     del df
     gc.collect()
@@ -48,7 +46,7 @@ def train_xgboost(df, num_folds, use_smote=False):
     # Définir la date et l'heure pour personnaliser les noms des runs
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    with mlflow.start_run(run_name=f'XGBoost_{"SMOTE" if use_smote else "StratifiedKFold"}_{current_time}'):
+    with mlflow.start_run(run_name=f'RandomForest_{"SMOTE" if use_smote else "StratifiedKFold"}_{current_time}'):
         # Créer le répertoire pour les artefacts
         metrics_dir = "artifacts/metrics"
         os.makedirs(metrics_dir, exist_ok=True)
@@ -62,18 +60,16 @@ def train_xgboost(df, num_folds, use_smote=False):
         mlflow.log_artifact(test_path)
 
         # Définir le modèle et les hyperparamètres pour RandomizedSearchCV
-        base_model = XGBClassifier(
-            objective='binary:logistic',
-            use_label_encoder=False,
-            eval_metric='auc',
+        base_model = RandomForestClassifier(
+            random_state=1001,
             n_jobs=-1
         )
         param_dist = {
-            'n_estimators': [100, 300, 500],
-            'max_depth': [4, 6, 8],
-            'learning_rate': uniform(0.01, 0.1),
-            'subsample': uniform(0.8, 0.2),
-            'colsample_bytree': uniform(0.8, 0.2)
+            'n_estimators': [100, 200, 300],
+            'max_depth': [4, 6, 8, None],
+            'min_samples_split': [2, 5, 10],
+            'min_samples_leaf': [1, 2, 4],
+            'bootstrap': [True, False]
         }
 
         # Fonction de scoring pour RandomizedSearchCV
@@ -142,7 +138,7 @@ def train_xgboost(df, num_folds, use_smote=False):
         plt.close()
 
         # Enregistrer le modèle final
-        mlflow.xgboost.log_model(best_model, "model")
+        mlflow.sklearn.log_model(best_model, "model")
 
 
 if __name__ == "__main__":
@@ -151,4 +147,4 @@ if __name__ == "__main__":
     data = normalize_column_names(data)
     # Entraînement du modèle avec SMOTE ou StratifiedKFold
     apply_smote = True  # Passer à False pour utiliser StratifiedKFold
-    train_xgboost(data, num_folds=10, use_smote=apply_smote)
+    train_random_forest(data, num_folds=10, use_smote=apply_smote)
