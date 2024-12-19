@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-import os
 import gc
+import os
 from datetime import datetime
-import time
-import pandas as pd
-import numpy as np
+
+import matplotlib.pyplot as plt
 import mlflow
 import mlflow.xgboost
-import seaborn as sns
-import matplotlib.pyplot as plt
-from xgboost import XGBClassifier
-from sklearn.metrics import roc_auc_score, confusion_matrix, classification_report, roc_curve, make_scorer
-from sklearn.model_selection import KFold, StratifiedKFold, GridSearchCV
+import numpy as np
+import pandas as pd
 from imblearn.over_sampling import SMOTE
+from sklearn.metrics import roc_auc_score, roc_curve, make_scorer
+from sklearn.model_selection import KFold, StratifiedKFold, GridSearchCV
+from xgboost import XGBClassifier
 
 from src.utils.common_functions import normalize_column_names, business_cost
 
